@@ -55,7 +55,10 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
   Converters get converter => _converter;
 
   Map instanceToStoreMapResult(Map result){
-    result['_id'] = result.remove('id');
+    var id = result.remove('id');
+    if (id != null) {
+      result['_id'] = id;
+    }
     return result;
   }
   
