@@ -1,0 +1,13 @@
+name: springbok_db_mongo
+version: 0.0.1
+author: Christophe Hurpeau <christophe@hurpeau.com>
+description: Springbok DB API for Mongo
+homepage: https://github.com/christophehurpeau/dart-springbok_db_mongo
+documentation: https://github.com/christophehurpeau/dart-springbok_db_mongo/wiki
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+dependencies:
+  springbok_db:
+    path: ../springbok_db/
+  mongo_dart: '>=0.1.0'
+  unittest: '>=0.9.0 <0.10.0'
