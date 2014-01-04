@@ -15,6 +15,8 @@ class MongoId implements Id{
   
   MongoId.create(): this.fromObjectId(new Mongo.ObjectId());
   
+  MongoId.fromId(IdString id): this.fromHex(id.toString());
+  
   MongoId.fromHex(String string):
     _mongoId = Mongo.ObjectId.parse(string), _hexString = string;
   
