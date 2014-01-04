@@ -7,10 +7,10 @@ class MongoCursor<T extends Model> extends StoreCursor<T> {
   set fields(Map fields) => cursor.fields = fields;
   
   int get skip => cursor.skip;
-  set skip(int skip) => cursor.skip = skip;
+  set skip(int skip) => cursor.skip = (skip == null ? 0 : skip);
   
   int get limit => cursor.limit;
-  set limit(int limit) => cursor.limit = limit;
+  set limit(int limit) => cursor.limit = (limit == null ? 0 : limit);
   
   Map get sort => cursor.sort;
   set sort(Map sort) => cursor.sort = sort;
