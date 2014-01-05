@@ -36,11 +36,11 @@ class MongoStore extends AbstractStore<MongoStoreInstance> {
 }
 
 class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
-  static final Converters _converter = new Converters({
-    reflectClass(Id): const MongoIdConverter(),
-    reflectClass(Model): const ModelStoreConverter(),
-    reflectClass(List): const ListStoreConverter(),
-  });
+  static final Map _converterRules = {
+    reflectClass(Id): const MongoIdConverterRule(),
+    reflectClass(List): const ListConverterRule(),
+    reflectClass(Model): const ModelToMapStoreRule(),
+  };
   
   final MongoStore store;
   final Mongo.DbCollection collection;
@@ -52,7 +52,7 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
   
   Future open() => store.open();
   
-  Converters get converter => _converter;
+  Map get converterRules => _converterRules;
 
   Map instanceToStoreMapResult(Map result){
     var id = result.remove('id');

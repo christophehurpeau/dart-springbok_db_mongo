@@ -15,7 +15,7 @@ main() {
   test('ModelInfos',(){
     expect(User.$.variables.length, 4);
     var mongoId = new MongoId();
-    User u = User.$.createInstance({
+    User u = User.$.mapToInstance({
         'id': mongoId.toJson(),
         'firstName': 'John',
         'lastName': 'Doe',
