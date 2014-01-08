@@ -12,6 +12,7 @@ export 'package:mongo_dart/mongo_dart.dart' show MongoId;
 part 'src/id.dart';
 part 'src/cursor.dart';
 part 'src/converter.dart';
+part 'src/criteria.dart';
 
 springbokDbMongoInit() {
   Db.stringToStore['mongo'] = (Map config) => new MongoStore(config['uri']);
@@ -38,7 +39,8 @@ class MongoStore extends AbstractStore<MongoStoreInstance> {
 class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
   static final Map _converterRules = {
     reflectClass(Id): const MongoIdConverterRule(),
-    reflectClass(List): const ListConverterRule(),
+    reflectClass(IdString): const MongoIdConverterRule(),
+    reflectClass(MongoId): const MongoIdConverterRule(),
     reflectClass(Model): const ModelToMapStoreRule(),
   };
   
@@ -54,6 +56,14 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
   
   Map get converterRules => _converterRules;
 
+  StoreCriteria newCriteria() => new MongoStoreCriteria(model$);
+
+  StoreCriteria idToCriteria(Id id) => newCriteria()..fieldEqualsTo('id',
+                        id is MongoId ? id : new MongoId.fromHex(id.toString()));
+  StoreCriteria idsToCriteria(Iterable<Id> ids) => newCriteria()
+      ..fieldInValues('id', ids.map((id) => id is MongoId ? id : new MongoId.fromHex(id.toString()))
+          .toList(growable: false));
+  
   Map instanceToStoreMapResult(Map result){
     var id = result.remove('id');
     if (id != null) {
@@ -68,14 +78,17 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
     return model$.storeMapToInstance(result);
   }
   
-  Future<MongoCursor<T>> cursor([criteria])
-    => open().then((_) => new MongoCursor(this, collection.find(criteria)));
-  Future<int> count([criteria])
-    => open().then((_) => collection.count(criteria));
-  Future<List> distinct(String field, [criteria])
-    => open().then((_) => collection.distinct(field, criteria));
+  Future<MongoCursor<T>> cursor([MongoStoreCriteria criteria])
+    => open().then((_){
+      print('MognoStoreInstance: new cursor, criteria = ${criteria.toMap()}');
+      return new MongoCursor(this, collection.find(criteria.toMap()));
+    });
+  Future<int> count([MongoStoreCriteria criteria])
+    => open().then((_) => collection.count(criteria == null ? null : criteria.toMap()));
+  Future<List> distinct(String field, [MongoStoreCriteria criteria])
+    => open().then((_) => collection.distinct(field, criteria == null ? null : criteria.toMap()));
 
-  Future<T> findOne([criteria, fields])
+  Future<T> findOne([MongoStoreCriteria criteria, fields])
     => cursor(criteria).then((MongoCursor cursor){
         return cursor.next()
           .then((T model){
@@ -89,21 +102,18 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
   Future insertAll(List<Map> values)
     => open().then((_) => collection.insertAll(values));
 
-  Future update(criteria, Map values)
-    => open().then((_) => collection.update(criteria, values, multiUpdate: true));
-  Future updateOne(criteria, Map values) 
-    => open().then((_) => collection.update(criteria, values, multiUpdate: false));
+  Future update(MongoStoreCriteria criteria, Map values)
+    => open().then((_) => collection.update(criteria == null ? null : criteria.toMap(), values, multiUpdate: true));
+  Future updateOne(MongoStoreCriteria criteria, Map values) 
+    => open().then((_) => collection.update(criteria == null ? null : criteria.toMap(), values, multiUpdate: false));
   
   Future save(Map values)
     => open().then((_) => collection.save(values));
   
-  Future remove(criteria)
-    => open().then((_) => collection.remove(criteria));
-  Future removeOne(criteria)
-    => open().then((_) => collection.remove(criteria)); //we cannot limit...
+  Future remove(MongoStoreCriteria criteria)
+    => open().then((_) => collection.remove(criteria == null ? null : criteria.toMap()));
+  Future removeOne(MongoStoreCriteria criteria)
+    => open().then((_) => collection.remove(criteria == null ? null : criteria.toMap())); //we cannot limit...
   
-  Map idToCriteria(Id id) => {
-    '_id': (id is MongoId ? id : new MongoId.fromHex(id.toString()))._mongoId
-  };
 }
 

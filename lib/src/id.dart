@@ -23,8 +23,8 @@ class MongoId implements Id{
   MongoId.fromObjectId(Mongo.ObjectId mongoId):
     _mongoId = mongoId, _hexString = mongoId.toHexString();
   
-  String toString() => _hexString;
-  String toJson() => _hexString;
+  toString() => _hexString;
+  toJson() => _hexString;
   
   int get hashCode => _hexString.hashCode;
   

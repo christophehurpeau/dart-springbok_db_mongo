@@ -12,7 +12,7 @@ class User extends Model {
 
 
 main() {
-  test('ModelInfos',(){
+  test('mapToInstance and instanceToMap',(){
     expect(User.$.variables.length, 4);
     var mongoId = new MongoId();
     User u = User.$.mapToInstance({
@@ -26,7 +26,7 @@ main() {
     expect(u.lastName, 'Doe');
     expect(u.age, 24);
     
-    expect(u.toJson(),{
+    expect(u.toMap(),{
       'id': mongoId.toJson(),
       'firstName': 'John',
       'lastName': 'Doe',
