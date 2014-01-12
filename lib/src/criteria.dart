@@ -15,6 +15,11 @@ class MongoStoreCriteria extends StoreCriteria {
     criteria[field == 'id' ? '_id' : field] = { r'$in': values };
   }
   
+  or(Iterable<MongoStoreCriteria> listOfCriteria) {
+    assert(criteria[r'$or'] == null);
+    criteria[r'$or'] = listOfCriteria.map((c) => c.toMap());
+  }
+  
   toMap() {
     print('MongoStoreCriteria: ${model$.dataToStoreData(criteria)}');
     return model$.dataToStoreData(criteria);
