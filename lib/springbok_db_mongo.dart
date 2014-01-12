@@ -41,7 +41,7 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
     reflectClass(Id): const MongoIdConverterRule(),
     reflectClass(IdString): const MongoIdConverterRule(),
     reflectClass(MongoId): const MongoIdConverterRule(),
-    reflectClass(Model): const ModelToMapStoreRule(),
+    reflectClass(Model): const ModelToMapRule(),
   };
   
   final MongoStore store;
@@ -80,8 +80,7 @@ class MongoStoreInstance<T extends Model> extends AbstractStoreInstance<T> {
   
   Future<MongoCursor<T>> cursor([MongoStoreCriteria criteria])
     => open().then((_){
-      print('MognoStoreInstance: new cursor, criteria = ${criteria.toMap()}');
-      return new MongoCursor(this, collection.find(criteria.toMap()));
+      return new MongoCursor(this, collection.find(criteria == null ? null : criteria.toMap()));
     });
   Future<int> count([MongoStoreCriteria criteria])
     => open().then((_) => collection.count(criteria == null ? null : criteria.toMap()));
